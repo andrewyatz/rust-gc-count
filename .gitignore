@@ -1,0 +1,10 @@
+/target
+/.hypothesis
+/.vscode
+/bigWigInfo
+/bigWigSummary
+/wigToBigWig
+/*.fa*
+/*.wig
+/*.sizes
+/*.bw

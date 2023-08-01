@@ -27,3 +27,37 @@ Options:
   -h, --help                            Print help
   -V, --version                         Print version
 ```
+
+## Checksum calculator
+
+```bash
+target/release/checksumseq --input in.fa --output chrom.file
+```
+
+Another binary for calculating sequence lengths and checksums from a file. The resulting file is formted as tab separated with the following columns:
+
+1. Sequence ID as it appears in the FASTA file
+2. Sequence length
+3. Refget ga4gh identifier (SQ.sha512t24u)
+4. MD5 checksum hex encoded
+
+The resulting file can be used as a `chrom.sizes` file too.
+
+### Command line
+
+```
+Calculate GC and write into a wiggle file
+
+Usage: checksumseq [OPTIONS] --input <INPUT>
+
+Options:
+      --input <INPUT>    FASTA formatted file to calculate checksums from. Reads gzipped FASTA if the filename ends with .gz (including bgzip files)
+      --output <OUTPUT>  Output file (- means STDOUT). Each line is tab separated reporting "ID Length sha512t24u md5" [default: -]
+      --verbose          Be verbose
+  -h, --help             Print help (see more with '--help')
+  -V, --version          Print version
+```
+
+## Level of code quality
+
+The code developed here has not been extensively tested but has been verified as producing correct and expected output.

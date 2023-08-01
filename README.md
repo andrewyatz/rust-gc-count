@@ -46,15 +46,15 @@ The resulting file can be used as a `chrom.sizes` file too.
 ### Command line
 
 ```
-Calculate GC and write into a wiggle file
+Iterates through a FASTA file calclating checksums and sequence length
 
-Usage: checksumseq [OPTIONS] --input <INPUT>
+Usage: checksumseq [OPTIONS]
 
 Options:
-      --input <INPUT>    FASTA formatted file to calculate checksums from. Reads gzipped FASTA if the filename ends with .gz (including bgzip files)
+      --input <INPUT>    FASTA formatted file to calculate checksums from (- mean STDIN). Reads gzipped FASTA if the filename ends with .gz (including bgzip files) [default: -]
       --output <OUTPUT>  Output file (- means STDOUT). Each line is tab separated reporting "ID Length sha512t24u md5" [default: -]
       --verbose          Be verbose
-  -h, --help             Print help (see more with '--help')
+  -h, --help             Print help
   -V, --version          Print version
 ```
 

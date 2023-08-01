@@ -1,5 +1,5 @@
 use clap::Parser;
-use seq_io::fasta::{Reader, Record};
+use seq_io::fasta::{Reader,Record};
 use flate2::read::MultiGzDecoder;
 use std::fs::File;
 use std::io::prelude::{Read, Write};
@@ -7,14 +7,14 @@ use std::io::BufWriter;
 use sha2::Sha512;
 use md5::{Md5, Digest};
 use base64_url;
-use std::io::stdout;
+use std::io::{stdout,stdin};
 
 /// Parse a FASTA file and calculate checksums for each record
 #[derive(Parser)]
-#[command(author, version, about, long_about = "Iterates through a FASTA file calclating checksums and sequence length")]
+#[command(author, version, about = "Iterates through a FASTA file calclating checksums and sequence length")]
 struct Cli {
-    /// FASTA formatted file to calculate checksums from. Reads gzipped FASTA if the filename ends with .gz (including bgzip files)
-    #[arg(long, value_name = "INPUT")]
+    /// FASTA formatted file to calculate checksums from (- mean STDIN). Reads gzipped FASTA if the filename ends with .gz (including bgzip files)
+    #[arg(long, value_name = "INPUT", default_value="-")]
     input: std::path::PathBuf,
     /// Output file (- means STDOUT). Each line is tab separated reporting "ID Length sha512t24u md5"
     #[arg(long, value_name = "OUTPUT", default_value="-")]
@@ -34,9 +34,12 @@ fn main() {
         );
     }
 
-    let read = if args.input.extension().unwrap() == "gz" {
-        Box::new(MultiGzDecoder::new(File::open(args.input).unwrap())) as Box<dyn Read>
-    } else {
+    let read = if args.input.to_str().unwrap() == "-" {
+      Box::new(stdin()) as Box<dyn Read>
+    } else if args.input.extension().unwrap() == "gz" {
+      Box::new(MultiGzDecoder::new(File::open(args.input).unwrap())) as Box<dyn Read>
+    }
+    else {
         Box::new(File::open(args.input).unwrap()) as Box<dyn Read>
     };
     let mut reader = Reader::new(read);

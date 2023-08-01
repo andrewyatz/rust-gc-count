@@ -1,5 +1,7 @@
 use clap::Parser;
 use flate2::read::MultiGzDecoder;
+use flate2::write::GzEncoder;
+use flate2::Compression;
 use seq_io::fasta::{Reader, Record};
 use std::fs::File;
 use std::io::prelude::{Read, Write};
@@ -9,10 +11,10 @@ use std::io::BufWriter;
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
 struct Cli {
-    /// FASTA formatted file (can be gziped) to calculate GC from
+    /// FASTA formatted file to calculate GC from. Reads gzipped FASTA if the filename ends with .gz (including bgzip files)
     #[arg(long, value_name = "INPUT")]
     input: std::path::PathBuf,
-    /// Output wiggle file. One file will be produced
+    /// Output wiggle file. One file will be produced. Will be gzipped on the fly if the supplied filename ends with .gz (default compression level)
     #[arg(long, value_name = "OUTPUT")]
     output: std::path::PathBuf,
     /// Window size to calculate GC over
@@ -49,8 +51,16 @@ fn main() {
         Box::new(File::open(args.input).unwrap()) as Box<dyn Read>
     };
     let mut reader = Reader::new(read);
-    let output_file = File::create(args.output).expect("creation failed");
-    let mut writer = BufWriter::new(output_file);
+    // let output_file = File::create(args.output).expect("creation failed");
+    let write: Box<dyn Write> = if args.output.extension().unwrap() == "gz" {
+        Box::new(GzEncoder::new(
+            File::create(args.output).expect("creation failed"),
+            Compression::default(),
+        )) as Box<dyn Write>
+    } else {
+        Box::new(File::create(args.output).expect("creation failed")) as Box<dyn Write>
+    };
+    let mut writer = BufWriter::new(write);
 
     if args.verbose && args.write_chrom_sizes {
         println!(

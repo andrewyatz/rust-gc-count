@@ -41,7 +41,7 @@ fn main() {
     let args = Cli::parse();
 
     if args.verbose {
-        println!(
+        eprintln!(
             "==> Processing FASTA file {:?} and writing to {:?}",
             args.input, args.output
         );
@@ -64,7 +64,7 @@ fn main() {
     let mut writer = BufWriter::new(write);
 
     if args.verbose && args.write_chrom_sizes {
-        println!(
+        eprintln!(
             "==> Will write chrom.sizes file to {:?}",
             args.chrom_sizes_path
         );
@@ -87,7 +87,7 @@ fn main() {
         let record = record.expect("Error reading record");
         let id = record.id().unwrap();
         if args.verbose {
-            print!("==> Processing region {:?} ... ", id);
+            eprint!("==> Processing region {:?} ... ", id);
         }
         // variabletep is used versus fixedStep because there are differences in the
         // resulting BigWigs. Using variableStep keeps this inline with UCSC
@@ -127,11 +127,15 @@ fn main() {
         }
         n += 1;
         if args.verbose {
-            println!("done");
+            eprintln!("done");
         }
     }
+    writer.flush().expect("Could not close wig output file");
+    if chrom_sizes_writer.is_some() {
+        chrom_sizes_writer.as_mut().unwrap().flush().expect("Could not close chrom sizes stream");
+    }
     if args.verbose {
-        println!("==> Found and processed {} regions.", n);
+        eprintln!("==> Found and processed {} regions.", n);
     }
 }
 

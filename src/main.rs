@@ -18,7 +18,7 @@ struct Cli {
     #[arg(long, value_name = "OUTPUT")]
     output: std::path::PathBuf,
     /// Gzip compression level to use for writing. Set between 0 (no compression) to 9 (max compression).
-    #[arg(long, value_name = "LEVEL", default_value_t=5)]
+    #[arg(long, value_name = "LEVEL", default_value_t = 5)]
     compression_level: u32,
     /// Window size to calculate GC over
     #[arg(long, default_value_t = 5)]
@@ -132,7 +132,11 @@ fn main() {
     }
     writer.flush().expect("Could not close wig output file");
     if chrom_sizes_writer.is_some() {
-        chrom_sizes_writer.as_mut().unwrap().flush().expect("Could not close chrom sizes stream");
+        chrom_sizes_writer
+            .as_mut()
+            .unwrap()
+            .flush()
+            .expect("Could not close chrom sizes stream");
     }
     if args.verbose {
         eprintln!("==> Found and processed {} regions.", n);

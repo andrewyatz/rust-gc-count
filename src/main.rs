@@ -22,7 +22,7 @@ struct Cli {
     compression_level: u32,
     /// Window size to calculate GC over
     #[arg(long, default_value_t = 5)]
-    window: u8,
+    window: i32,
     /// Remove any trailing sequence and do not calcualte GC. Default behaviour is to retain the leftover sequence. GC is calculated over the remaining sequence length
     #[arg(long, default_value_t = false)]
     omit_tail: bool,
@@ -39,7 +39,6 @@ struct Cli {
 
 fn main() {
     let args = Cli::parse();
-    const WINDOW_SIZE: i32 = 5_i32;
 
     if args.verbose {
         println!(
@@ -78,6 +77,8 @@ fn main() {
         None
     };
 
+    let window_size: i32 = args.window;
+
     writer
         .write("track type=wiggle_0\n".as_bytes())
         .expect("Write failed");
@@ -92,7 +93,7 @@ fn main() {
         // resulting BigWigs. Using variableStep keeps this inline with UCSC
         // gc BigWig files
         writer
-            .write(format!("variableStep chrom={0} span={1}\n", id, WINDOW_SIZE).as_bytes())
+            .write(format!("variableStep chrom={0} span={1}\n", id, window_size).as_bytes())
             .expect("Write failed");
         let mut length = 0;
         let mut gc_count = 0;
@@ -104,9 +105,9 @@ fn main() {
                     gc_count += 1;
                 }
                 window_count += 1;
-                if window_count == WINDOW_SIZE {
+                if window_count == window_size {
                     iter_count += 1;
-                    write_gc(gc_count, WINDOW_SIZE, iter_count, &mut writer);
+                    write_gc(gc_count, window_size, iter_count, &mut writer);
                     gc_count = 0;
                     window_count = 0;
                 }
@@ -125,9 +126,13 @@ fn main() {
                 .expect("Write failed");
         }
         n += 1;
-        println!("done");
+        if args.verbose {
+            println!("done");
+        }
     }
-    println!("==> Found and processed {} regions.", n);
+    if args.verbose {
+        println!("==> Found and processed {} regions.", n);
+    }
 }
 
 fn write_gc(gc_count: i32, window_size: i32, iter_count: i32, writer: &mut impl Write) {

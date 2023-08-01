@@ -14,9 +14,12 @@ struct Cli {
     /// FASTA formatted file to calculate GC from. Reads gzipped FASTA if the filename ends with .gz (including bgzip files)
     #[arg(long, value_name = "INPUT")]
     input: std::path::PathBuf,
-    /// Output wiggle file. One file will be produced. Will be gzipped on the fly if the supplied filename ends with .gz (default compression level)
+    /// Output wiggle file. One file will be produced. Will be gzipped on the fly if the supplied filename ends with .gz
     #[arg(long, value_name = "OUTPUT")]
     output: std::path::PathBuf,
+    /// Gzip compression level to use for writing. Set between 0 (no compression) to 9 (max compression).
+    #[arg(long, value_name = "LEVEL", default_value_t=5)]
+    compression_level: u32,
     /// Window size to calculate GC over
     #[arg(long, default_value_t = 5)]
     window: u8,
@@ -51,11 +54,10 @@ fn main() {
         Box::new(File::open(args.input).unwrap()) as Box<dyn Read>
     };
     let mut reader = Reader::new(read);
-    // let output_file = File::create(args.output).expect("creation failed");
     let write: Box<dyn Write> = if args.output.extension().unwrap() == "gz" {
         Box::new(GzEncoder::new(
             File::create(args.output).expect("creation failed"),
-            Compression::default(),
+            Compression::new(args.compression_level),
         )) as Box<dyn Write>
     } else {
         Box::new(File::create(args.output).expect("creation failed")) as Box<dyn Write>

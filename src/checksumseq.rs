@@ -2,7 +2,7 @@ use base64_url;
 use clap::Parser;
 use flate2::read::MultiGzDecoder;
 use md5::{Digest, Md5};
-use seq_io::fasta::{Reader, Record};
+use seq_io::fasta::{Reader, Record, RefRecord};
 use sha2::Sha512;
 use std::fs::File;
 use std::io::prelude::{Read, Write};
@@ -57,32 +57,56 @@ fn main() {
     let mut n = 0;
 
     while let Some(record) = reader.next() {
-        let mut md5_hasher_box = Box::new(Md5::new());
-        let mut sha512_hasher_box = Box::new(Sha512::new());
         let record = record.expect("Error reading record");
-        let id = record.id().unwrap();
-        let mut length = 0;
-        if args.verbose {
-            eprint!("==> Processing region {:?} ... ", id);
-        }
-        for s in record.seq_lines() {
-            sha512_hasher_box.as_mut().update(s);
-            md5_hasher_box.as_mut().update(s);
-            length += s.len();
-        }
-        n += 1;
-        let sha512 = base64_url::encode(&sha512_hasher_box.as_mut().finalize_reset()[0..24]);
-        let md5 = format!("{:x}", md5_hasher_box.as_mut().finalize_reset());
-        let line = format!("{0}\t{1}\tSQ.{2}\t{3}\n", id, length, sha512, md5);
+        let result = process_sequence(record, args.verbose);
+        let line = format!("{0:#}\t{1:#}\tSQ.{2:#}\t{3:#}\n", result.0, result.1, result.2, result.3);
         writer
             .write(line.as_bytes())
             .expect("Could not write to file");
         if args.verbose {
             eprintln!("done");
         }
+        n += 1;
     }
     if args.verbose {
         eprintln!("==> Found and processed {} regions.", n);
     }
     writer.flush().expect("Could not flush writer");
+}
+
+fn process_sequence(record: RefRecord, verbose: bool) -> (String, usize, String, String) {
+    let mut md5_hasher_box = Box::new(Md5::new());
+    let mut sha512_hasher_box = Box::new(Sha512::new());
+    let id = record.id().unwrap();
+    let mut length = 0;
+    if verbose {
+        eprint!("==> Processing region {:?} ... ", id);
+    }
+    for s in record.seq_lines() {
+        sha512_hasher_box.as_mut().update(s.to_ascii_uppercase());
+        md5_hasher_box.as_mut().update(s.to_ascii_uppercase());
+        length += s.len();
+    }
+    let sha512 = base64_url::encode(&sha512_hasher_box.as_mut().finalize_reset()[0..24]);
+    let md5 = format!("{:x}", md5_hasher_box.as_mut().finalize_reset());
+    return (id.to_string(), length, sha512, md5);
+}
+
+#[test]
+fn it_works() {
+    let fasta: &[u8] = b"
+>id basic\n
+ACGT\n
+>id second\n
+acgT\n
+";
+    let mut reader = Reader::new(fasta);
+    while let Some(record) = reader.next() {
+        let record = record.expect("Error reading record");
+        let result = process_sequence(record, false);
+        assert_eq!(result.0, "id");
+        assert_eq!(result.1, 4);
+        assert_eq!(result.2, "aKF498dAxcJAqme6QYQ7EZ07-fiw8Kw2");
+        assert_eq!(result.3, "f1f8f4bf413b16ad135722aa4591043e");
+    }
 }

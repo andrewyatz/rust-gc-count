@@ -13,6 +13,7 @@ use std::io::{stdin, stdout};
 #[derive(Parser)]
 #[command(
     author,
+    name = "checksumseq",
     version,
     about = "Iterates through a FASTA file calclating checksums and sequence length"
 )]

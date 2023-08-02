@@ -9,7 +9,13 @@ use std::io::BufWriter;
 
 /// Parse a FASTA file and calculate GC based on the specified window into a wig file
 #[derive(Parser)]
-#[command(author, version, about, long_about = None)]
+#[command(
+    author, 
+    name = "gccount", 
+    version, 
+    about = "Calculate GC and write into a wiggle file", 
+    long_about = None
+)]
 struct Cli {
     /// FASTA formatted file to calculate GC from. Reads gzipped FASTA if the filename ends with .gz (including bgzip files)
     #[arg(long, value_name = "INPUT")]

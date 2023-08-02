@@ -3,6 +3,10 @@ name = "rust-gc-count"
 version = "0.1.0"
 edition = "2021"
 description = "Calculate GC and write into a wiggle file"
+license = "Apache-2.0"
+repository = "https://github.com/andrewyatz/rust-gc-count"
+readme = "README.md"
+keywords = ["bio", "fasta"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -21,3 +25,6 @@ path="src/main.rs"
 [[bin]]
 name="checksumseq"
 path="src/checksumseq.rs"
+
+[profile.release]
+lto = true

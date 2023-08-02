@@ -59,7 +59,10 @@ fn main() {
     while let Some(record) = reader.next() {
         let record = record.expect("Error reading record");
         let result = process_sequence(record, args.verbose);
-        let line = format!("{0:#}\t{1:#}\tSQ.{2:#}\t{3:#}\n", result.0, result.1, result.2, result.3);
+        let line = format!(
+            "{0:#}\t{1:#}\tSQ.{2:#}\t{3:#}\n",
+            result.0, result.1, result.2, result.3
+        );
         writer
             .write(line.as_bytes())
             .expect("Could not write to file");

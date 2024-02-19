@@ -86,7 +86,7 @@ fn main() {
     let window_size: i32 = args.window;
 
     writer
-        .write("track type=wiggle_0\n".as_bytes())
+        .write_all("track type=wiggle_0\n".as_bytes())
         .expect("Write failed");
     let mut n = 0;
     while let Some(record) = reader.next() {
@@ -99,7 +99,7 @@ fn main() {
         // resulting BigWigs. Using variableStep keeps this inline with UCSC
         // gc BigWig files
         writer
-            .write(format!("variableStep chrom={0} span={1}\n", id, window_size).as_bytes())
+            .write_all(format!("variableStep chrom={0} span={1}\n", id, window_size).as_bytes())
             .expect("Write failed");
         let mut length = 0;
         let mut gc_count = 0;
@@ -128,7 +128,7 @@ fn main() {
             chrom_sizes_writer
                 .as_mut()
                 .unwrap()
-                .write(format!("{0}\t{1}\n", record.id().unwrap(), length).as_bytes())
+                .write_all(format!("{0}\t{1}\n", record.id().unwrap(), length).as_bytes())
                 .expect("Write failed");
         }
         n += 1;
@@ -153,6 +153,6 @@ fn write_gc(gc_count: i32, window_size: i32, iter_count: i32, writer: &mut impl 
     let gc = (gc_count as f32 / window_size as f32) * 100_f32;
     let start_location = ((iter_count - 1) * window_size) + 1;
     writer
-        .write(format!("{}\t{}\n", start_location, gc as i32).as_bytes())
+        .write_all(format!("{}\t{}\n", start_location, gc as i32).as_bytes())
         .expect("Write failed");
 }

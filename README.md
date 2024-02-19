@@ -58,6 +58,29 @@ Options:
   -V, --version          Print version
 ```
 
+### From within Python
+Python bindings are available for the checksumseq calculation. The following code demonstrates how to use the bindings.
+
+#### Install the bindings
+[`maturin`](https://github.com/PyO3/maturin) is used to build the bindings and install them into the current environment. Ensure you are using the Python environment you want to install the bindings into.
+```bash
+pip install maturin
+```
+Then navigate to the `rust-gc-count/bindings` directory and run the following command to install the bindings.
+```bash
+maturin build --release
+```
+
+#### Use the bindings
+To use the bindings in Python, the following code demonstrates how to use the bindings.
+```python
+from gc_count import checksum
+
+results = checksum("path/to/seq/fasta")
+for result in results:
+    print(result.sha512)
+```
+
 ## Level of code quality
 
 The code developed here has not been extensively tested but has been verified as producing correct and expected output.

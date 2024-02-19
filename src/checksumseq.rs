@@ -93,7 +93,8 @@ fn process_sequence(record: RefRecord, verbose: bool) -> (String, usize, String,
     }
     let sha512 = base64_url::encode(&sha512_hasher_box.as_mut().finalize_reset()[0..24]);
     let md5 = format!("{:x}", md5_hasher_box.as_mut().finalize_reset());
-    return (id.to_string(), length, sha512, md5);
+    
+    (id.to_string(), length, sha512, md5)
 }
 
 #[test]

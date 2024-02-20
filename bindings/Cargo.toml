@@ -1,0 +1,14 @@
+[package]
+name = "gc_count"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[lib]
+name = "gc_count"
+crate-type = ["cdylib"]
+
+[dependencies]
+pyo3 = "0.19.0"
+seq_io = "0.3.1"
+rust_gc_count = { path = "../" }

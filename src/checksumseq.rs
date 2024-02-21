@@ -59,10 +59,13 @@ fn main() {
     while let Some(record) = reader.next() {
         let record = record.expect("Error reading record");
         let result = process_sequence(record, args.verbose);
-        let line = format!(
-            "{0:#}\t{1:#}\tSQ.{2:#}\t{3:#}\n",
-            result.0, result.1, result.2, result.3
-        );
+
+        let id = result.id;
+        let length = result.length;
+        let sha512 = result.sha512;
+        let md5 = result.md5;
+
+        let line = format!("{0:#}\t{1:#}\tSQ.{2:#}\t{3:#}\n", id, length, sha512, md5);
         writer
             .write_all(line.as_bytes())
             .expect("Could not write to file");
@@ -89,9 +92,9 @@ acgT\n
     while let Some(record) = reader.next() {
         let record = record.expect("Error reading record");
         let result = process_sequence(record, false);
-        assert_eq!(result.0, "id");
-        assert_eq!(result.1, 4);
-        assert_eq!(result.2, "aKF498dAxcJAqme6QYQ7EZ07-fiw8Kw2");
-        assert_eq!(result.3, "f1f8f4bf413b16ad135722aa4591043e");
+        assert_eq!(result.id, "id");
+        assert_eq!(result.length, 4);
+        assert_eq!(result.sha512, "aKF498dAxcJAqme6QYQ7EZ07-fiw8Kw2");
+        assert_eq!(result.md5, "f1f8f4bf413b16ad135722aa4591043e");
     }
 }

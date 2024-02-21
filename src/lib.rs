@@ -13,7 +13,7 @@ pub mod checksum {
 
     use super::*;
 
-    pub fn process_sequence(record: RefRecord, verbose: bool) -> (String, usize, String, String) {
+    pub fn process_sequence(record: RefRecord, verbose: bool) -> ChecksumResult {
         let mut md5_hasher_box = Box::new(Md5::new());
         let mut sha512_hasher_box = Box::new(Sha512::new());
         let id = record.id().unwrap();
@@ -29,7 +29,19 @@ pub mod checksum {
         let sha512 = base64_url::encode(&sha512_hasher_box.as_mut().finalize_reset()[0..24]);
         let md5 = format!("{:x}", md5_hasher_box.as_mut().finalize_reset());
 
-        (id.to_string(), length, sha512, md5)
+        ChecksumResult {
+            id: id.to_string(),
+            length,
+            sha512,
+            md5,
+        }
+    }
+
+    pub struct ChecksumResult {
+        pub id: String,
+        pub length: usize,
+        pub sha512: String,
+        pub md5: String,
     }
 }
 

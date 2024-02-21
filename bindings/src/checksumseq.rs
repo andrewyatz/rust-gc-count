@@ -14,14 +14,9 @@ pub fn checksum(file: String, verbose: Option<bool>) -> Vec<PyChecksumResult> {
 
     while let Some(record) = reader.next() {
         let record = record.unwrap();
-        let (id, length, sha512, md5) = process_sequence(record, verbose);
-        
-        results.push(PyChecksumResult {
-            id,
-            length,
-            sha512,
-            md5
-        });
+        let result = process_sequence(record, verbose);
+
+        results.push(PyChecksumResult::from(result));
     }
 
     results

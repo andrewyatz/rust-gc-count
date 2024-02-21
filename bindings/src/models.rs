@@ -14,6 +14,13 @@ pub struct PyChecksumResult {
     pub md5: String
 }
 
+#[pymethods]
+impl PyChecksumResult {
+    fn __repr__(&self) -> String {
+        format!("<ChecksumResult for {}>", self.id)
+    }
+}
+
 impl From<ChecksumResult> for PyChecksumResult {
     fn from(value: ChecksumResult) -> Self {
         PyChecksumResult {

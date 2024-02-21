@@ -26,3 +26,32 @@ def checksum(file: str, verbose: bool) -> List[ChecksumResult]:
     :param file: The file to checksum
     :param verbose: Whether to print out the progress
     """
+
+def write_gc_count_to_file(
+    input: str,
+    output: str,
+    compression_level: int,
+    window_size: int,
+    omit_tail: bool,
+    chrom_sizes_path: str,
+    write_chrom_sizes: bool,
+    verbose: bool,
+) -> None:
+    """
+    Calculate the GC content and write it to a file. The file will be a
+    tab-separated file with the following columns:
+    
+    Chromosome name
+    Start position
+    End position
+    GC content
+
+    :param input: The input file to calculate the GC content from
+    :param output: The output file to write the GC content to
+    :param compression_level: The compression level to use for the output file
+    :param window_size: The window size to use for calculating the GC content
+    :param omit_tail: Whether to omit the tail of the sequence
+    :param chrom_sizes_path: The path to the chromosome sizes file
+    :param write_chrom_sizes: Whether to write the chromosome sizes to the output file
+    :param verbose: Whether to print out the progress
+    """       

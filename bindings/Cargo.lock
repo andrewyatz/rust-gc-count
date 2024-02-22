@@ -398,7 +398,7 @@ dependencies = [
 
 [[package]]
 name = "rust_gc_count"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "base64-url",
  "clap",
@@ -410,7 +410,7 @@ dependencies = [
 
 [[package]]
 name = "rust_gc_count_py"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "pyo3",
  "rust_gc_count",

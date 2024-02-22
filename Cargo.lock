@@ -402,7 +402,7 @@ dependencies = [
 
 [[package]]
 name = "rust_gc_count"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "base64-url",
  "clap",

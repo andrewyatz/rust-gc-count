@@ -209,15 +209,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "gc_count"
-version = "0.1.0"
-dependencies = [
- "pyo3",
- "rust_gc_count",
- "seq_io",
-]
-
-[[package]]
 name = "generic-array"
 version = "0.14.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -407,7 +398,7 @@ dependencies = [
 
 [[package]]
 name = "rust_gc_count"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "base64-url",
  "clap",
@@ -415,6 +406,15 @@ dependencies = [
  "md-5",
  "seq_io",
  "sha2",
+]
+
+[[package]]
+name = "rust_gc_count_py"
+version = "0.1.0"
+dependencies = [
+ "pyo3",
+ "rust_gc_count",
+ "seq_io",
 ]
 
 [[package]]

@@ -17,7 +17,7 @@ use rust_gc_count::checksum::process_sequence;
     about = "Iterates through a FASTA file calclating checksums and sequence length"
 )]
 struct Cli {
-    /// FASTA formatted file to calculate checksums from (- mean STDIN). Reads gzipped FASTA if the filename ends with .gz (including bgzip files)
+    /// FASTA formatted file to calculate checksums from (- means STDIN). Reads gzipped FASTA if the filename ends with .gz (including bgzip files)
     #[arg(long, value_name = "INPUT", default_value = "-")]
     input: std::path::PathBuf,
     /// Output file (- means STDOUT). Each line is tab separated reporting "ID Length sha512t24u md5"
@@ -30,24 +30,36 @@ struct Cli {
 
 fn main() {
     let args = Cli::parse();
+    let input_name = &args.input;
+    let input_name_str = input_name.to_str().expect("no input filname given");
+    let output_name = &args.output;
+    let output_name_str = output_name.to_str().expect("no output filename given");
 
     if args.verbose {
         println!(
             "==> Processing FASTA file {:?} and writing to {:?}",
-            args.input, args.output
+            input_name, output_name
         );
     }
 
-    let read = if args.input.to_str().unwrap() == "-" {
+    let read = if input_name_str == "-" {
         Box::new(stdin()) as Box<dyn Read>
-    } else if args.input.extension().unwrap() == "gz" {
-        Box::new(MultiGzDecoder::new(File::open(args.input).unwrap())) as Box<dyn Read>
+    } else if input_name.extension().expect("no input filename extension") == "gz" {
+        let file = match File::open(input_name) {
+            Err(why) => panic!("couldn't open {}: {}", input_name_str, why),
+            Ok(file) => file,
+        };
+        Box::new(MultiGzDecoder::new(file)) as Box<dyn Read>
     } else {
-        Box::new(File::open(args.input).unwrap()) as Box<dyn Read>
+        let file = match File::open(input_name) {
+            Err(why) => panic!("couldn't open {}: {}", input_name_str, why),
+            Ok(file) => file,
+        };
+        Box::new(file) as Box<dyn Read>
     };
     let mut reader = Reader::new(read);
 
-    let writer = if args.output.to_str().unwrap() == "-" {
+    let writer = if output_name_str == "-" {
         Box::new(stdout()) as Box<dyn Write>
     } else {
         Box::new(File::create(args.output).expect("Cannot open file for writing")) as Box<dyn Write>
@@ -81,7 +93,7 @@ fn main() {
 }
 
 #[test]
-fn it_works() {
+fn checksum_works() {
     let fasta: &[u8] = b"
 >id basic\n
 ACGT\n

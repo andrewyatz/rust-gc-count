@@ -16,7 +16,7 @@ pub mod checksum {
     pub fn process_sequence(record: RefRecord, verbose: bool) -> ChecksumResult {
         let mut md5_hasher_box = Box::new(Md5::new());
         let mut sha512_hasher_box = Box::new(Sha512::new());
-        let id = record.id().unwrap();
+        let id = record.id().expect("No ID found for the FASTA record");
         let mut length = 0;
         if verbose {
             eprint!("==> Processing region {:?} ... ", id);
@@ -69,13 +69,15 @@ pub mod gc_count {
         write_chrom_sizes: bool,
         verbose: bool,
     ) {
-        let read = if input.extension().unwrap() == "gz" {
-            Box::new(MultiGzDecoder::new(File::open(input).unwrap())) as Box<dyn Read>
+        let read = if input.extension().expect("No output filename found") == "gz" {
+            let input_file = File::open(input).expect("No input file found");
+            Box::new(MultiGzDecoder::new(input_file)) as Box<dyn Read>
         } else {
-            Box::new(File::open(input).unwrap()) as Box<dyn Read>
+            let input_file = File::open(input).expect("No input file found");
+            Box::new(input_file) as Box<dyn Read>
         };
         let mut reader = Reader::new(read);
-        let write: Box<dyn Write> = if output.extension().unwrap() == "gz" {
+        let write: Box<dyn Write> = if output.extension().expect("No output filename") == "gz" {
             Box::new(GzEncoder::new(
                 File::create(output).expect("creation failed"),
                 Compression::new(compression_level),
@@ -102,7 +104,7 @@ pub mod gc_count {
         let mut n = 0;
         while let Some(record) = reader.next() {
             let record = record.expect("Error reading record");
-            let id = record.id().unwrap();
+            let id = record.id().expect("No ID found for the current record");
             if verbose {
                 eprint!("==> Processing region {:?} ... ", id);
             }
@@ -139,7 +141,7 @@ pub mod gc_count {
                 chrom_sizes_writer
                     .as_mut()
                     .unwrap()
-                    .write_all(format!("{0}\t{1}\n", record.id().unwrap(), length).as_bytes())
+                    .write_all(format!("{0}\t{1}\n", id, length).as_bytes())
                     .expect("Write failed");
             }
             n += 1;
